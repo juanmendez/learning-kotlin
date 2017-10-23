@@ -6,8 +6,6 @@ package info.juanmendez.kotlin
  * I have never done anything with Kotlin, so this is my first lines of code. :)
  */
 
-import java.util.*
-
 fun sum(a: Int, b: Int): Int {
     return a + b
 }
