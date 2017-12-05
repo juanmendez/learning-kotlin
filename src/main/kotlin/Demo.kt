@@ -1,11 +1,20 @@
 /**
  * Created by musta on 10/23/2017.
  */
-fun start(): String = "hello"
 
 
-//here is how we start with a static main method
+//create a person class with a given constructor..
+class Person(val name:String){
+    val cats = arrayListOf<Cat>()
 
-fun main( args:Array<String>){
-    println( start() )
 }
+
+data class Cat( val name:String, val age:Int=0 ){
+}
+
+
+//single function.. no body
+fun getOldestCat( cats:List<Cat> ):Cat= cats.sortedByDescending { it.age }[0]
+
+
+fun getYoungestCat( cats:List<Cat> ):Cat= cats.sortedBy { it.age }[0]
