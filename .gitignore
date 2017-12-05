@@ -52,3 +52,4 @@ Java.gitignore
 .gradle
 gradle/
 .idea/libraries/**/*
+*.iml
