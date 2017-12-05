@@ -25,6 +25,10 @@ fun getYoungestCat( cats:List<Cat> ):Cat= cats.sortedBy { it.age }[0]
  * we have appended functionality to Person class
  */
 
+fun Person.getOldestCat():Cat{
+    return getOldestCat(cats)
+}
+
 fun Person.getYoungestCat():Cat{
     return getYoungestCat(cats)
 }

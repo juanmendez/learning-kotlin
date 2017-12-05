@@ -57,7 +57,7 @@ class Tests {
             println( "$alias:${cat.name}")
         }
 
-        assertEquals( getOldestCat(juan.cats), cats.get("lynda2") )
+        assertEquals( juan.getOldestCat(), cats.get("lynda2") )
 
         //on purpose, make a call being explicit about parameter
         assertEquals( getOldestCat(juan.cats),getOldestCat( cats=juan.cats) )
