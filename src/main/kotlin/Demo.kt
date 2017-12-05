@@ -18,3 +18,13 @@ fun getOldestCat( cats:List<Cat> ):Cat= cats.sortedByDescending { it.age }[0]
 
 
 fun getYoungestCat( cats:List<Cat> ):Cat= cats.sortedBy { it.age }[0]
+
+
+/**
+ * In Kotlin, you don't need to make util classes, as you can tell here
+ * we have appended functionality to Person class
+ */
+
+fun Person.getYoungestCat():Cat{
+    return getYoungestCat(cats)
+}

@@ -68,6 +68,6 @@ class Tests {
         juan.cats.add( chino )
 
 
-        assertEquals( getYoungestCat(juan.cats), chino )
+        assertEquals( juan.getYoungestCat(), chino )
     }
 }
