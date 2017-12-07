@@ -2,7 +2,6 @@
  * Created by musta on 10/23/2017.
  */
 
-
 //create a person class with a given constructor..
 class Person(val name:String){
     val cats = arrayListOf<Cat>()
