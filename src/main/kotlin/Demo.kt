@@ -1,33 +1,23 @@
 /**
  * Created by musta on 10/23/2017.
  */
-
-//create a person class with a given constructor..
-class Person(val name:String){
-    val cats = arrayListOf<Cat>()
-
-}
-
-data class Cat( val name:String, val age:Int=0 ){
+interface Animal{
+    fun getName():String
+    fun getLegs():Int
 }
 
 
-//single function.. no body
-fun getOldestCat( cats:List<Cat> ):Cat= cats.sortedByDescending { it.age }[0]
+class Human(private val name:String, private val legs:Int=0 ):Animal{
 
+    override fun getName(): String {
+        return name
+    }
 
-fun getYoungestCat( cats:List<Cat> ):Cat= cats.sortedBy { it.age }[0]
-
-
-/**
- * In Kotlin, you don't need to make util classes, as you can tell here
- * we have appended functionality to Person class
- */
-
-fun Person.getOldestCat():Cat{
-    return getOldestCat(cats)
+    override fun getLegs(): Int {
+        return legs
+    }
 }
 
-fun Person.getYoungestCat():Cat{
-    return getYoungestCat(cats)
+fun describeAnimal( animal: Animal ):String{
+    return "Animal's name is ${animal.getName()} and has ${animal.getLegs()} leg(s)"
 }
