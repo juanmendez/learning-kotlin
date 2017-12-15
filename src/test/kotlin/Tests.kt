@@ -1,5 +1,6 @@
 
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -8,28 +9,41 @@ import org.junit.Test
 class Tests {
 
     @Test
-    fun testAnimalInterface(){
+    fun testInheritance(){
 
-        val human = Human("Juan" );
-        Assert.assertTrue( human is Animal )
-        Assert.assertEquals( human.getLegs(), 0)
+        val js = ScriptingLanguage( "JavaScript", 1995 )
+
+        //this is goofy and is always true: replaces instanceof
+        assertTrue( js is Language )
+        assertEquals( js.version , 0 )
 
 
-        //interesting way how to instantiate an instance on the fly
-        //if only one method then we can use labmda instead
-        val cat:Animal = object:Animal{
-            override fun getName(): String {
-                return "Meow"
-            }
-
-            override fun getLegs(): Int {
-                return 0
-            }
+        /**
+         * Here is how we implement a new instance of abstract class Framework
+         */
+        val angular = object: Framework("Angular", 4.0f ) {
+            override fun getTheme():String="""
+                |$name=>One framework.
+                |Mobile & desktop!"
+                """.trimMargin()
         }
 
-        Assert.assertTrue( cat is Animal )
 
-        describeAnimal( human )
-        describeAnimal( cat )
+        val react = object:Framework("ReactJS", 1.0f ){
+            override fun getTheme(): String="$name=>A JavaScript library for building user interfaces"
+
+        }
+
+
+        val vue = object:Framework("VueJS", 1.0f ){
+            override fun getTheme(): String="""$name=>The Progressive
+                |JavaScript Framework""".trimMargin()
+
+        }
+
+
+        println( angular.getTheme() )
+        println( react.getTheme() )
+        println( vue.getTheme() )
     }
 }
