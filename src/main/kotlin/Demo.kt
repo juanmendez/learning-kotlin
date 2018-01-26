@@ -2,7 +2,7 @@
  * Created by musta on 10/23/2017.
  */
 
-//Java reads file class name as Utilso
+//Java reads file class name as Utils
 @file:JvmName("Utils")
 
 class Application( val name:String ){

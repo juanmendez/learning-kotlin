@@ -9,7 +9,7 @@ import org.junit.Test
 class Tests {
 
     @Test
-    fun testHolderSingleton() {
+    fun `test singleton`() {
         assertEquals(Holder.apps.size, 0)
 
         Holder.apps.add( Application("1stApp"))
