@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="Tests" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-11-30T21:43:51" hostname="juan-Inspiron-15-7568" time="0.001">
-  <properties/>
-  <testcase name="hello" classname="Tests" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
