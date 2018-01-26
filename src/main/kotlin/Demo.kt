@@ -5,33 +5,21 @@
 //Java reads file class name as Utils
 @file:JvmName("Utils")
 
-class Application( val name:String ){
-
-    fun createActivity( activityName:String ):Activity=Activity( activityName, this )
-
-    //it can also implement an interface
-    companion object {
-
-        //static Application createApp( String name )
-        @JvmStatic //without this in Java reads as Application.Companion.createApp
-        fun createApp( name:String)=Application( name )
-
-        //static Activity createAppAndActivity( String appName, String activityName )
-        @JvmStatic
-        fun createAppAndActivity( appName:String, activityName:String):Activity{
-            val application = Application( appName )
-
-            return application.createActivity( activityName )
-        }
-    }
+interface LogCallback{
+    fun writeContent( content:String )
 }
 
 
-class Activity( val name:String, val application: Application )
-
-fun Activity.greeting()="hi, from your App... ${application.name} with love to my beloved {$name}(activity)"
-
-
-object Holder{
-    val apps = arrayListOf<Application>()
+fun asyncCall( message:String, log:LogCallback ){
+    log.writeContent( message )
 }
+
+/**
+ * second argument is expecting a signature. it requires a
+ * method which receives one string argument, and uses Unit or Void as in Java.
+ */
+fun writeFunNotation( message:String, log:(String)->Unit ){
+    log( message )
+}
+
+data class Pet( var name:String = "", var age:Int = 0)

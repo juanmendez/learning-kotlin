@@ -1,31 +1,29 @@
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestsInJava {
 
     @Test
-    public void testHolderSingleton(){
+    public void testsInJavaVersion(){
 
-        Holder singleton = Holder.INSTANCE;
+        //this is just related to working with Kotlin
+        Pet pet = new Pet();
+        pet.setAge( 1 );
+        pet.setName( "Chino");
 
-        Assert.assertEquals( singleton.getApps().size(), 0 );
-        singleton.getApps().add( new Application("1st"));
-        singleton.getApps().add( new Application("2nd"));
-        singleton.getApps().add( new Application("3rd"));
+        final String[] allLetters = {""};
+        String[] calls = new String[]{"a", "b", "c", "d" };
 
+        for (String letter: calls) {
 
-        Application application = singleton.getApps().get( singleton.getApps().size()-1 );
-        Assert.assertEquals( application.getName(), "3rd");
+            Utils.writeFunNotation( letter, s -> {
+                allLetters[0] += s;
 
-        final Activity mainActivity = application.createActivity("MainActivity");
-        Assert.assertEquals( mainActivity.getName(), "MainActivity");
-        Assert.assertEquals( mainActivity.getApplication(), application );
+                return null;
+            });
+        }
 
-        Application.createApp( "4th");
-        Activity activity = Application.createAppAndActivity( "5thApp", "2ndActivity");
-
-
-        //@file:JvmName("Utils")
-        System.out.println( Utils.greeting( activity ));
+        assertEquals( allLetters[0], "abcd" );
     }
 }
