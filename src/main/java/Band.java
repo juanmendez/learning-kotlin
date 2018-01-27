@@ -16,4 +16,8 @@ public class Band {
     public void addAlbum( Album album ){
         albums.add( album );
     }
+
+    public List<Album> getAlbums() {
+        return albums;
+    }
 }
