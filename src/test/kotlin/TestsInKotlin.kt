@@ -1,86 +1,60 @@
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import java.io.File
 
 /**
  * Created by musta on 10/23/2017.
  */
 class Tests {
+    lateinit var bands:List<Band>
 
-    @Test
-    fun `making lambda instance of interface`() {
-        asyncCall( "hello", object:LogCallback{
-            override fun writeContent( msg:String ){
-                println( "Your msg $msg")
-                assertEquals( msg, "hello" )
-            }
-        })
+    @Before
+    fun `before`(){
+        val str = "./raw/great_eighties_albums.csv"
+        val file = File(str)
+
+        assertTrue(file.exists())
+
+        bands = file.readLines() //0. returns a list of strings
+                .drop(1) //skip header row
+                .map { it.split(",") } //make row a list of strings split by comma
+                .map { Band().apply { //map each col to band attribute
+                    name = it[0]
+                    album = it[1]
+                    year = it[2].toInt()
+                }} //0. mapping turned initial list into List<Band>
+
+        assertTrue( bands.isNotEmpty() )
     }
 
 
-    /**
-     * This time we are passing a lambda which matches the signature of the second argument.
-     * It expects a method which accepts a string, but is Void or Unit in Kotlin
-     */
     @Test
-    fun `functional notation`(){
-        writeFunNotation( "hello world", { s-> assertEquals(s, "hello world") } )
+    fun `filterTest`() {
 
-        //also we can do it in dsl way
-        writeFunNotation( "hello world" ) { s-> assertEquals(s, "hello world") }
-
-        //why not use it?, therefore we don't even apply argument
-        writeFunNotation( "hello world" ) { assertEquals( it, "hello world") }
-    }
-
-
-    /**
-     * Compared with Java, in Kotlin you can have an external variable not declared final
-     */
-    @Test
-    fun `no final external var`(){
-
-        var allLetters = ""
-
-        writeFunNotation( "a", {allLetters+=it})
-        writeFunNotation( "b", {allLetters+=it})
-        writeFunNotation( "c", {allLetters+=it})
-        writeFunNotation( "d", {allLetters+=it})
-
-        assertEquals( allLetters, "abcd" )
+        var aereosmiths = bands.filter { it.name.contains( Regex( "Aerosmith" )) }
+        assertEquals( aereosmiths.size, 2 )
     }
 
     @Test
-    fun `learn with`(){
+    fun `predicateTest`(){
+        //all albums are in the 80's
+        assertTrue( bands.all { it.year.toString().contains( Regex("198")) } )
 
+        //at least one band's name is Metallica
+        assertTrue( bands.any({it.name.equals("Metallica")}) )
+        assertTrue( bands.any( { predicateByBandName(it, "Aerosmith")}) )
 
-        var max = Pet()
+        //there is no band called Nickelback
+        assertTrue( bands.none({it.name.equals("Nickelback")}))
 
-        with( max ){
-            age = 2
-            name = "max"
-        }
-
-
-        var chino = Pet()
-
-        with( chino ){
-            age = 4
-            name = "Chino"
-        }
-
-        assertEquals( max.age, 2 )
-
-        /**
-         * In Java, we do this by chaining setters having the class object returned.
-         * Here apply works a lot easier by simply assigning values to each
-         * of its members
-         */
-        var felipe = Pet().apply {
-            age = 4
-            name = "Felipe"
-        }
+        //two albums belong to Aerosmith
+        assertEquals( bands.count({ it.name.equals("Aerosmith")}), 2 )
     }
 
+    //custom predicates, help elaborate reusable predicates rather than being inline
+    fun predicateByBandName(band:Band, name:String )=band.name.equals( name )
 
 }
