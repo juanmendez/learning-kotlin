@@ -1,9 +1,12 @@
+import info.juanmendez.kotlin.Album
+import info.juanmendez.kotlin.Band
+
 /**
  * Created by musta on 10/23/2017.
  */
-data class FunAlbum( val album:Album )
+data class FunAlbum( val album: Album)
 
-class GreatAlbum:Album{
+class GreatAlbum: Album {
     lateinit var theName:String
 
     override fun setName(name: String?) {
@@ -11,7 +14,7 @@ class GreatAlbum:Album{
     }
 }
 
-fun printOutBand( band:Band? ){
+fun printOutBand( band: Band? ){
 
     //${band?.name} = band!=null ? band.name?:''
     //?:false = band.albums!=null ? band.albums.isNotEmpty():false
@@ -21,7 +24,6 @@ fun printOutBand( band:Band? ){
     /**
      * band?.albums?.let {} : if( band!= null && band.albums!=null ){}
      */
-
     band?.albums?.let {
 
         for( album in it ){

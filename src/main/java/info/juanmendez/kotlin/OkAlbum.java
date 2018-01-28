@@ -1,3 +1,5 @@
+package info.juanmendez.kotlin;
+
 public class OkAlbum {
     private Album album;
 
