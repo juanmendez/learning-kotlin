@@ -6,7 +6,7 @@ import org.junit.Test
 import java.io.File
 
 /**
- * Created by musta on 10/23/2017.
+ * Created by musta on 10/23/2017
  */
 class Tests {
 
@@ -34,7 +34,7 @@ class Tests {
                             name = it[0]
                             album = it[1]
                             year = it[2].let {
-                                if( it.isNotEmpty() )
+                                if( it.isNotEmpty() && it.matches( Regex("\\d+")))
                                     it.toInt()
                                 else
                                     0
