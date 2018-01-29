@@ -1,7 +1,7 @@
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
+import junit.framework.Assert.assertNotSame
+import junit.framework.Assert.assertTrue
+import org.junit.Assert
 import org.junit.Test
 import java.io.File
 
@@ -9,82 +9,92 @@ import java.io.File
  * Created by musta on 10/23/2017.
  */
 class Tests {
-    lateinit var bands:List<Band>
 
-    @Before
-    fun `before`(){
-        val str = "./raw/great_eighties_albums.csv"
+    /**
+     * In Java we don't have this option..
+     * but in Kotlin List<Band> won't allow to update
+     * therefore we need a writable collection.
+     */
+    lateinit var bands:MutableList<Band?>
+
+    @Test
+    fun `dealingWithNullableAlbums`(){
+        val str = "./raw/SomeNullableAlbums.csv"
         val file = File(str)
 
-        assertTrue(file.exists())
+        Assert.assertTrue(file.exists())
+
+        val thoseBands = file.readLines() //0. returns a list of strings
+                .drop(1) //skip header row
+                .map { it.split(",") } //make row a list of strings split by comma
+                .map {
+
+                        Band().apply {
+                            //map col:List<String> to each attribute in band
+                            name = it[0]
+                            album = it[1]
+                            year = it[2].let {
+                                if( it.isNotEmpty() )
+                                    it.toInt()
+                                else
+                                    0
+                            }
+                        }
+                }
+
+        bands = arrayListOf()
+
+        for( band in thoseBands ){
+            if( band.name.isNotEmpty() ){
+                bands.add( band )
+            }else{
+                bands.add( null )
+            }
+        }
+
+
+        Assert.assertTrue(bands.isNotEmpty())
+    }
+
+
+    @Test
+    fun `simplerExample`(){
+        val str = "./raw/SomeNullableAlbums.csv"
+        val file = File(str)
+
+        Assert.assertTrue(file.exists())
 
         bands = file.readLines() //0. returns a list of strings
                 .drop(1) //skip header row
                 .map { it.split(",") } //make row a list of strings split by comma
-                .map { Band().apply { //map each col to band attribute
-                    name = it[0]
-                    album = it[1]
-                    year = it[2].toInt()
-                }} //0. mapping turned initial list into List<Band>
+                .map {
 
-        assertTrue( bands.isNotEmpty() )
-    }
-
-
-    @Test
-    fun `filterTest`() {
-
-        var aereosmiths = bands.filter { it.name.contains( Regex( "Aerosmith" )) }
-        assertEquals( aereosmiths.size, 2 )
-    }
-
-    @Test
-    fun `predicateTest`(){
-        //all albums are in the 80's
-        assertTrue( bands.all { it.year.toString().contains( Regex("198")) } )
-
-        //at least one band's name is Metallica
-        assertTrue( bands.any({it.name.equals("Metallica")}) )
-        assertTrue( bands.any( { predicateByBandName(it, "Aerosmith")}) )
-
-        //there is no band called Nickelback
-        assertTrue( bands.none({it.name.equals("Nickelback")}))
-
-        //two albums belong to Aerosmith
-        assertEquals( bands.count({ it.name.equals("Aerosmith")}), 2 )
-    }
-
-    //custom predicates, help elaborate reusable predicates rather than being inline
-    fun predicateByBandName(band:Band, name:String )=band.name.equals( name )
+                    if( (it[0]+it[1]+it[2]).trim().isNotEmpty()  ){
+                        Band().apply {
+                            //map each col to band attribute
+                            name = it[0]
+                            album = it[1]
+                            year = it[2].toInt()
+                        }
+                    }else{
+                        null
+                    }
+                }.toMutableList() //mutable must get assigned a mutable list
 
 
-    @Test
-    fun `asSequenceTest`(){
-        val bands = getBandSequence("./raw/great_nineties_albums.csv")
-        assertTrue( bands.count() > 0 )
+        Assert.assertTrue(bands.isNotEmpty())
 
-        //all albums are in the 90's
-        assertTrue( bands.all { it.year.toString().contains( Regex("199")) } )
+        //this is how to pass list as List<Band> argument
+        assertTrue( bands.filterNotNull() is List<Band> )
 
-        //two albums belong to Soundgarden
-        assertEquals( bands.count({ it.name.equals("Soundgarden")}), 2 )
-    }
+        //this is ok, if we pass it as an argument to a method
+        assertTrue( bands is List<Band?>)
 
-    /**
-     * Outer loop iterates elements, inner loop iterates transformations
-     * Without sequence, outer loop iterates transformations, inner loop iterates elements
-     *
-     * Sequences are useful for streaming or very large lists
-     */
-    fun getBandSequence( fileLocation: String ): Sequence<Band> {
-        val file = File(fileLocation)
+        //we want to protect our own list allowing others to have a copy of ours
+        val theOtherList = bands.toMutableList()
+        theOtherList.add( Band() )
 
-        return file.readLines().asSequence().drop(1) //skip header row
-                .map { it.split(",") } //make row a list of strings split by comma
-                .map { Band().apply { //map each col to band attribute
-                    name = it[0]
-                    album = it[1]
-                    year = it[2].toInt()
-                }} //0. mapping turned initial list into List<Band>
+        assertNotSame( theOtherList, bands )
+        assertNotSame( theOtherList.size, bands.size )
     }
 }
