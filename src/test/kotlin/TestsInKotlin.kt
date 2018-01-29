@@ -16,7 +16,7 @@ class Tests {
          * Imagine there is an asynchronous callback from getNonNullableList
          * So this works...
          */
-        `Split bands by nullable and non-nullable`( {realBands, emptyBands->
+        `get real and empty bands`( {realBands, emptyBands->
             run {
                 assertTrue( realBands.isNotEmpty() )
                 assertTrue( emptyBands.isNotEmpty() )
@@ -31,7 +31,7 @@ class Tests {
      *
      * Note: removing inline only affects performance
      */
-    private inline fun `Split bands by nullable and non-nullable`( callback:(List<Band>, List<Band> )->Unit ) {
+    private inline fun `get real and empty bands`( callback:(List<Band>, List<Band> )->Unit ) {
 
         val str = "./raw/SomeNullableAlbums.csv"
         val file = File(str)
