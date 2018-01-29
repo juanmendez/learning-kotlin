@@ -24,7 +24,14 @@ class Tests {
         })
     }
 
-    private fun `Split bands by nullable and non-nullable`( callback:(List<Band>, List<Band> )->Unit ) {
+    /**
+     * callback is a method, and not a SAM representation. That's why we use the keyword inline
+     * ensuring to be expected as such. This is a good thing to do to improve performance but should be used in
+     * lambdas directly used which are not kept in memory. Example: collections use inlines for filtering, and actions
+     *
+     * Note: removing inline only affects performance
+     */
+    private inline fun `Split bands by nullable and non-nullable`( callback:(List<Band>, List<Band> )->Unit ) {
 
         val str = "./raw/SomeNullableAlbums.csv"
         val file = File(str)
