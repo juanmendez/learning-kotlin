@@ -9,82 +9,50 @@ import java.io.File
  * Created by musta on 10/23/2017.
  */
 class Tests {
-    lateinit var bands:List<Band>
+    val genreMap = HashMap<Genre, MutableList<Band>>()
 
     @Before
     fun `before`(){
-        val str = "./raw/great_eighties_albums.csv"
+        val str = "./raw/rock_albums.csv"
         val file = File(str)
 
         assertTrue(file.exists())
 
-        bands = file.readLines() //0. returns a list of strings
+        file.readLines() //0. returns a list of strings
                 .drop(1) //skip header row
-                .map { it.split(",") } //make row a list of strings split by comma
-                .map { Band().apply { //map each col to band attribute
-                    name = it[0]
-                    album = it[1]
-                    year = it[2].toInt()
-                }} //0. mapping turned initial list into List<Band>
+                .forEach {
+                    val list = it.split(",")
 
-        assertTrue( bands.isNotEmpty() )
+                    //searching for Genre based on its alias attribute
+                    val genre:Genre? = Genre.values().filter { it.alias.equals(list[3]) }.first()
+
+                    genre?.let {
+                        if( genreMap[it] == null )
+                            genreMap[it] = mutableListOf()
+
+                        genreMap[it]?.add( Band().apply {
+                            name = list[0]
+                            album = list[1]
+                            year = list[2].toInt()
+                        })
+                    }
+                }
     }
 
 
     @Test
     fun `filterTest`() {
+        //three albums by Bon Jovi, and Def Leppard
+        assertEquals( genreMap[ Genre.ROCK]?.size, 3 )
+        println( genreMap[Genre.ROCK]?.distinctBy { it.name })
 
-        var aereosmiths = bands.filter { it.name.contains( Regex( "Aerosmith" )) }
-        assertEquals( aereosmiths.size, 2 )
-    }
+        //lets see if Aereosmith is in classic rock,,
+        assertTrue( genreMap[Genre.CLASSICROCK]?.any { it.name.equals("Aerosmith") } == true )
 
-    @Test
-    fun `predicateTest`(){
-        //all albums are in the 80's
-        assertTrue( bands.all { it.year.toString().contains( Regex("198")) } )
+        //lets see if Black Sabbath is in Heavy Metal,
+        assertTrue( genreMap[Genre.HEAVYMETAL]?.any { it.name.equals("Black Sabbath") } == true )
 
-        //at least one band's name is Metallica
-        assertTrue( bands.any({it.name.equals("Metallica")}) )
-        assertTrue( bands.any( { predicateByBandName(it, "Aerosmith")}) )
-
-        //there is no band called Nickelback
-        assertTrue( bands.none({it.name.equals("Nickelback")}))
-
-        //two albums belong to Aerosmith
-        assertEquals( bands.count({ it.name.equals("Aerosmith")}), 2 )
-    }
-
-    //custom predicates, help elaborate reusable predicates rather than being inline
-    fun predicateByBandName(band:Band, name:String )=band.name.equals( name )
-
-
-    @Test
-    fun `asSequenceTest`(){
-        val bands = getBandSequence("./raw/great_nineties_albums.csv")
-        assertTrue( bands.count() > 0 )
-
-        //all albums are in the 90's
-        assertTrue( bands.all { it.year.toString().contains( Regex("199")) } )
-
-        //two albums belong to Soundgarden
-        assertEquals( bands.count({ it.name.equals("Soundgarden")}), 2 )
-    }
-
-    /**
-     * Outer loop iterates elements, inner loop iterates transformations
-     * Without sequence, outer loop iterates transformations, inner loop iterates elements
-     *
-     * Sequences are useful for streaming or very large lists
-     */
-    fun getBandSequence( fileLocation: String ): Sequence<Band> {
-        val file = File(fileLocation)
-
-        return file.readLines().asSequence().drop(1) //skip header row
-                .map { it.split(",") } //make row a list of strings split by comma
-                .map { Band().apply { //map each col to band attribute
-                    name = it[0]
-                    album = it[1]
-                    year = it[2].toInt()
-                }} //0. mapping turned initial list into List<Band>
+        //lets see if Megadeth is in Thrash Metal,
+        assertTrue( genreMap[Genre.TRASHMETAL]?.any { it.name.equals("Megadeth") } == true )
     }
 }
