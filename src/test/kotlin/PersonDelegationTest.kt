@@ -10,7 +10,7 @@ import org.junit.Test
  *
  * @see kotlinlang.org/docs/reference/delegation.html
  */
-class Tests {
+class PersonDelegationTest {
     val person = Person("Peter", 10)
     lateinit var delegatedOnce: DelegatedOnce
     lateinit var delegatedTwice: DelegatedTwice
@@ -37,12 +37,16 @@ class Tests {
     }
 
     @Test
-    fun `testSecondDelegation`(){
+    fun `testSecondDelegation`() {
         person.name = "Piotr"
-        assertEquals( delegatedOnce.name, "Piotr" )
-        assertEquals( delegatedTwice.name, "Piotr" )
+        delegatedTwice.age = 12
+        assertEquals(delegatedOnce.name, "Piotr")
+        assertEquals(delegatedTwice.name, "Piotr")
+
+        assertEquals(person.age, 12)
+        assertEquals(delegatedOnce.age, 12)
 
         //Polish
-        println( delegatedTwice.message() )
+        println(delegatedTwice.message())
     }
 }
