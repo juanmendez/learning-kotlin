@@ -1,13 +1,26 @@
 /**
- * Created by musta on 10/23/2017.
+ * Created by Juan Mendez on 10/23/2017.
  */
 
-data class Band( var name:String = "", var album:String ="", var year:Int = 0 )
+interface IPerson {
+    var age:Int
+    var name:String
+    fun message():String
+}
 
-enum class Genre( var alias: String ){
-    TRASHMETAL( "Thrash Metal"),
-    ROCK( "Rock"),
-    HEAVYMETAL("Heavy Metal"),
-    CLASSICROCK( "Classic Rock"),
-    ALTERNATIVE( "Alternative" )
+class Person(override var name:String, override var age: Int ): IPerson{
+
+    override fun message()="$name is $age years old"
+}
+
+class DelegatedOnce(person: IPerson) : IPerson by person{
+
+    //if you remove this one, then Person's message is used instead
+    override fun message()="$name tiene $age años"
+}
+
+class DelegatedTwice(delegatedOnce: IPerson) : IPerson by delegatedOnce{
+
+    //if you remove this one, then DelegateOnce's message is used instead
+    override fun message()="$name ma $age lat"
 }
