@@ -1,4 +1,4 @@
-# learningKotlin
+# Learning Kotlin
 
 Try to learn Kotlin in a weekend, and you can easily forget it. But if it is done in a consistent learning manner daily then you can not just learn it but retain it.
 
