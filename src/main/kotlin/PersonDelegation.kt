@@ -24,15 +24,3 @@ class DelegatedTwice(delegatedOnce: IPerson) : IPerson by delegatedOnce{
     //if you remove this one, then DelegateOnce's message is used instead
     override fun message()="$name ma $age lat"
 }
-
-
-interface IHome{
-    var address:String
-    fun describe():String
-}
-
-class RealHome(override var address: String) :IHome{
-    override fun describe(): String = "Welcome Home!! $address"
-}
-
-class DelegatedHome( val home:IHome ):IHome by home
