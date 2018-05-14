@@ -1,6 +1,8 @@
 
 import io.reactivex.Flowable
 import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
+import io.reactivex.functions.Consumer
 import io.reactivex.observers.TestObserver
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert.assertEquals
@@ -14,14 +16,14 @@ import java.io.File
  * Created by musta on 10/23/2017.
  */
 class Tests {
-    lateinit var eightiesBands:List<Band>
-    lateinit var ninetiesBands:List<Band>
+    private val eightiesFile = "../../raw/great_eighties_albums.csv"
+    private val ninetiesFile = "../../raw/great_nineties_albums.csv"
+    private lateinit var eightiesBands:List<Band>
+    private lateinit var ninetiesBands:List<Band>
 
     @Before
     fun `before`(){
-        val strEighties = "../../raw/great_eighties_albums.csv"
-        val strNineties = "../../raw/great_nineties_albums.csv"
-        var file = File(strEighties)
+        var file = File(eightiesFile)
 
         assertTrue(file.exists())
 
@@ -37,7 +39,7 @@ class Tests {
         assertTrue( eightiesBands.isNotEmpty() )
 
 
-        file = File(strNineties)
+        file = File(ninetiesFile)
         ninetiesBands = file.readLines() //0. returns a list of strings
                 .drop(1) //skip header row
                 .map { it.split(",") } //make row a list of strings split by comma
@@ -48,15 +50,6 @@ class Tests {
                 }} //0. mapping turned initial list into List<Band>
 
         assertTrue( ninetiesBands.isNotEmpty() )
-    }
-
-
-    @Test
-    fun `rxZip`(){
-        val eighties = Flowable.just( eightiesBands )
-        val nineties = Flowable.just( ninetiesBands )
-
-
     }
 
     @Test
@@ -105,7 +98,7 @@ class Tests {
 
 
     @Test
-    fun `asSequenceTest`(){
+    fun `make a plain execution into an observable`(){
 
         val testSubscriber = TestObserver<Sequence<Band>>()
 
@@ -113,8 +106,41 @@ class Tests {
             it.onNext(getBandSequence("../../raw/great_nineties_albums.csv"))
         }.subscribe(testSubscriber)
 
+        /**
+         * Just:
+         * - nice to use, but it runs even without subscription
+         */
+        Observable.just(
+                getBandSequence("../../raw/great_nineties_albums.csv")
+        ).subscribe(testSubscriber)
+
+
+        /**
+         * Defers:
+         * - wraps an expensive method
+         * - executes until subscribed
+         * - always expects to return an observable
+         * @see <a href="https://github.com/CDRussell/CasterRxJava/tree/defer">Defer</a>
+         */
+        Observable.defer {
+            Observable.just(getBandSequence("../../raw/great_nineties_albums.csv"))
+        }.subscribe(testSubscriber)
 
         testSubscriber.assertOf { it.values().isNotEmpty() }
+
+
+        Observable.fromCallable{
+            getBandSequence("../../raw/great_nineties_albums.csv")
+        }.subscribe(testSubscriber)
+        testSubscriber.assertOf { it.values().isNotEmpty() }
+
+
+        /**
+         * Defer and fromCallable
+         * both do much the same. FromCallable is a lot shorter to write, and ideal.
+         * Defer is great when it comes to return an observable. So that can be a reason why to use it over fromCallable
+         */
+
         /*
 
         //all albums are in the 90's
@@ -122,6 +148,66 @@ class Tests {
 
         //two albums belong to Soundgarden
         assertEquals( bands.count({ it.name.equals("Soundgarden")}), 2 )*/
+    }
+
+
+    @Test
+    fun `multiple observables into a zip`(){
+        val testObserver = TestSubscriber<Int>()
+
+        Flowable.zip( getObservableBands(eightiesFile,"Bon Jovi"),
+                getObservableBands(ninetiesFile, "Pearl Jam"),
+                BiFunction { t1:List<Band>, t2:List<Band> -> t1.size+t2.size })
+                .subscribe(testObserver)
+
+        testObserver.assertOf { it.values().isNotEmpty() }
+    }
+
+    @Test
+    fun `chain of observable into zip`(){
+
+        val observableBands = mutableListOf<Flowable<List<Band>>>()
+
+        listOf("Bon Jovi", "Aerosmith").forEach { observableBands.add( getObservableBands(eightiesFile,it)) }
+
+        Flowable
+                .merge(observableBands)
+                .subscribe {
+                    println(it.size)
+                }
+
+        observableBands.clear()
+
+        Flowable
+                .just(listOf("Bon Jovi", "Aerosmith"))
+                .flatMap {
+                    it.forEach { observableBands.add( getObservableBands(eightiesFile,it)) }
+
+                    Flowable.merge(observableBands)
+                }.subscribe {
+                    println(it.size)
+                }
+
+
+        observableBands.clear()
+
+        Flowable
+                .just(listOf("Bon Jovi", "Aerosmith"))
+                .flatMap { Flowable.fromIterable(it) }
+                .map {
+                    getObservableBands(eightiesFile,it)
+                }
+                .toList()
+                .toFlowable()
+                .flatMap {
+                    Flowable.merge(it)
+                }.subscribe( Consumer {
+                    it
+                })
+
+
+
+
     }
 
     /**
@@ -140,5 +226,29 @@ class Tests {
                     album = it[1]
                     year = it[2].toInt()
                 }} //0. mapping turned initial list into List<Band>
+    }
+
+    /**
+     * It is kind of redundant, but lets work with multiple calls
+     */
+    fun getObservableBands(fileLocation: String, bandName: String): Flowable<List<Band>> {
+        val file = File(fileLocation)
+
+        val list = file.readLines().asSequence().drop(1) //skip header row
+                .map { it.split(",") } //make row a list of strings split by comma
+                .map { Band().apply { //map each col to band attribute
+                    name = it[0]
+                    album = it[1]
+                    year = it[2].toInt()
+                }}.filter { it.name == bandName }.toList()
+
+        return Flowable.just(list)
+    }
+
+    fun provideRating():Flowable<Int> = Flowable.just(randomWithRange(1,5))
+
+    fun randomWithRange(min: Int, max: Int): Int {
+        val range = max - min + 1
+        return (Math.random() * range).toInt() + min
     }
 }
