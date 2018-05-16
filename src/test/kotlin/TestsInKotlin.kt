@@ -1,6 +1,5 @@
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
+import org.junit.Assert.*
 import org.junit.Test
 
 /**
@@ -30,5 +29,10 @@ class Tests {
         assertNotEquals( application, activity.application )
 
         println( activity.greeting() )
+
+
+        val appCompatActivity = AppCompatActivity("AppCompatActivity", application)
+        assertTrue(appCompatActivity.nickname.isNotEmpty())
+        assertEquals(AppCompatActivity.NUMOFINSTANCES, 1)
     }
 }
