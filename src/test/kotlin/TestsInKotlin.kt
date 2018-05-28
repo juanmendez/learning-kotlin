@@ -193,7 +193,7 @@ class Tests {
 
         Flowable
                 .just(listOf("Bon Jovi", "Aerosmith"))
-                .flatMap { Flowable.fromIterable(it) }
+                .flatMapIterable { it }
                 .map {
                     getObservableBands(eightiesFile,it)
                 }
@@ -202,12 +202,39 @@ class Tests {
                 .flatMap {
                     Flowable.merge(it)
                 }.subscribe( Consumer {
-                    it
+                    println(it)
                 })
 
 
 
 
+    }
+
+
+    @Test
+    fun `chain of observables to get bands and then their ratings`(){
+
+        val observableBands = mutableListOf<Flowable<List<Band>>>()
+
+        listOf("Bon Jovi", "Aerosmith").forEach { observableBands.add( getObservableBands(eightiesFile,it)) }
+
+
+        Flowable
+                .just(listOf("Bon Jovi", "Aerosmith"))
+                .flatMapIterable { it }
+                .flatMap {
+                    getObservableBands(eightiesFile,it)
+                }
+                .flatMapIterable { it }
+                .withLatestFrom(
+                        provideRating(),
+                        BiFunction { t1:Band, t2:Int -> kotlin.run {
+                            t1.rate = t2
+                            t1
+                        } }
+                ).subscribe {
+                    println(it)
+                }
     }
 
     /**
@@ -245,9 +272,9 @@ class Tests {
         return Flowable.just(list)
     }
 
-    fun provideRating():Flowable<Int> = Flowable.just(randomWithRange(1,5))
+    fun provideRating():Flowable<Int> = Flowable.just(randomRating(1,5))
 
-    fun randomWithRange(min: Int, max: Int): Int {
+    fun randomRating(min: Int, max: Int): Int {
         val range = max - min + 1
         return (Math.random() * range).toInt() + min
     }
