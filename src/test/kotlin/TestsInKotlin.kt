@@ -204,10 +204,6 @@ class Tests {
                 }.subscribe( Consumer {
                     println(it)
                 })
-
-
-
-
     }
 
 
@@ -219,6 +215,9 @@ class Tests {
         listOf("Bon Jovi", "Aerosmith").forEach { observableBands.add( getObservableBands(eightiesFile,it)) }
 
 
+        /**
+         * I couldn't find a way to combine two observables. Zip worked, but only let the iteration happened once.
+         */
         Flowable
                 .just(listOf("Bon Jovi", "Aerosmith"))
                 .flatMapIterable { it }
@@ -226,13 +225,12 @@ class Tests {
                     getObservableBands(eightiesFile,it)
                 }
                 .flatMapIterable { it }
-                .withLatestFrom(
-                        provideRating(),
-                        BiFunction { t1:Band, t2:Int -> kotlin.run {
-                            t1.rate = t2
-                            t1
-                        } }
-                ).subscribe {
+                .doOnNext {
+                    it.rate = randomRating(1,5)
+                }
+                .toList()
+                .toFlowable()
+                .subscribe {
                     println(it)
                 }
     }
@@ -271,8 +269,6 @@ class Tests {
 
         return Flowable.just(list)
     }
-
-    fun provideRating():Flowable<Int> = Flowable.just(randomRating(1,5))
 
     fun randomRating(min: Int, max: Int): Int {
         val range = max - min + 1
