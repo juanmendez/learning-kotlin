@@ -2,7 +2,9 @@ group 'info.juanmendez.learningkotlin'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.2.41'
+    ext.kotlin_version = "1.2.51"
+    ext.rx_java_version = "2.1.16"
+    ext.rx_kotlin_version = "2.2.0"
 
     repositories {
         mavenCentral()

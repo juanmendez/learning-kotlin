@@ -13,11 +13,12 @@ import java.io.File
 class Tests {
     lateinit var eightiesBands: List<Band>
     lateinit var ninetiesBands: List<Band>
-
+    val strEighties = "../../raw/great_eighties_albums.csv"
+    val strNineties = "../../raw/great_nineties_albums.csv"
+    
     @Before
     fun `before`() {
-        val strEighties = "../../raw/great_eighties_albums.csv"
-        val strNineties = "../../raw/great_nineties_albums.csv"
+        
         var file = File(strEighties)
 
         assertTrue(file.exists())
@@ -37,7 +38,7 @@ class Tests {
         assertTrue(eightiesBands.isNotEmpty())
 
 
-        file = File(ninetiesFile)
+        file = File(strNineties)
         ninetiesBands = file.readLines() //0. returns a list of strings
                 .drop(1) //skip header row
                 .map { it.split(",") } //make row a list of strings split by comma
@@ -164,8 +165,8 @@ class Tests {
     fun `multiple observables into a zip`(){
         val testObserver = TestSubscriber<Int>()
 
-        Flowable.zip( getObservableBands(eightiesFile,"Bon Jovi"),
-                getObservableBands(ninetiesFile, "Pearl Jam"),
+        Flowable.zip( getObservableBands(strEighties,"Bon Jovi"),
+                getObservableBands(strNineties, "Pearl Jam"),
                 BiFunction { t1:List<Band>, t2:List<Band> -> t1.size+t2.size })
                 .subscribe(testObserver)
 
@@ -177,7 +178,7 @@ class Tests {
 
         val observableBands = mutableListOf<Flowable<List<Band>>>()
 
-        listOf("Bon Jovi", "Aerosmith").forEach { observableBands.add( getObservableBands(eightiesFile,it)) }
+        listOf("Bon Jovi", "Aerosmith").forEach { observableBands.add( getObservableBands(strEighties,it)) }
 
         Flowable
                 .merge(observableBands)
@@ -190,7 +191,7 @@ class Tests {
         Flowable
                 .just(listOf("Bon Jovi", "Aerosmith"))
                 .flatMap {
-                    it.forEach { observableBands.add( getObservableBands(eightiesFile,it)) }
+                    it.forEach { observableBands.add( getObservableBands(strEighties,it)) }
 
                     Flowable.merge(observableBands)
                 }.subscribe {
@@ -204,7 +205,7 @@ class Tests {
                 .just(listOf("Bon Jovi", "Aerosmith"))
                 .flatMapIterable { it }
                 .map {
-                    getObservableBands(eightiesFile,it)
+                    getObservableBands(strEighties,it)
                 }
                 .toList()
                 .toFlowable()
@@ -221,7 +222,7 @@ class Tests {
 
         val observableBands = mutableListOf<Flowable<List<Band>>>()
 
-        listOf("Bon Jovi", "Aerosmith").forEach { observableBands.add( getObservableBands(eightiesFile,it)) }
+        listOf("Bon Jovi", "Aerosmith").forEach { observableBands.add( getObservableBands(strEighties,it)) }
 
 
         /**
@@ -231,7 +232,7 @@ class Tests {
                 .just(listOf("Bon Jovi", "Aerosmith"))
                 .flatMapIterable { it }
                 .flatMap {
-                    getObservableBands(eightiesFile,it)
+                    getObservableBands(strEighties,it)
                 }
                 .flatMapIterable { it }
                 .doOnNext {
