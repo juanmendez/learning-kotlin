@@ -1,3 +1,4 @@
+
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
@@ -243,6 +244,20 @@ class Tests {
                 .subscribe {
                     println(it)
                 }
+    }
+
+    @Test
+    fun `test relay`() {
+        val observer = TestObserver<String>()
+
+        val module = ModuleBehaviorRelay
+        module.simpleValues()
+
+        observer.assertNotSubscribed()
+        module.doNext("hello world")
+
+        module.asObservable().subscribe(observer)
+        assertTrue(observer.values().contains("hello world"))
     }
 
     /**
