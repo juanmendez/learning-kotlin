@@ -1,9 +1,6 @@
 import info.juanmendez.kotlin.Album
 import info.juanmendez.kotlin.Band
 
-/**
- * Created by musta on 10/23/2017.
- */
 data class FunAlbum( val album: Album)
 
 class GreatAlbum: Album {
