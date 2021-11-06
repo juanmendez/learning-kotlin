@@ -33,3 +33,21 @@ fun printOutBand( band: Band? ){
         }
     }
 }
+
+/**
+ * As a refresh, sealed classes hide if being tried to access outside their packages
+ */
+sealed interface Polygon
+interface Rectangle: Polygon
+interface Triangle: Polygon
+
+/**
+ * In Dart we use Freezed to make inmutable classes which is already found using data classes.
+ * The difference is those objects can be modified at runtime having vars, here if you try to
+ * use vars, then you get the following error
+ * `Value class primary constructor must have only final read-only (val) property parameters`
+ */
+@JvmInline
+value class FreezedPolygon(val item: Polygon)
+
+data class UnfreezedPolygon(var item: Polygon )

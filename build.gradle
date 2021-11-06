@@ -2,7 +2,7 @@ group "info.juanmendez.learningkotlin"
 version "1.0-SNAPSHOT"
 
 buildscript {
-    ext.kotlin_version = "1.4.21"
+    ext.kotlin_version = "1.5.31"
 
     repositories {
         mavenCentral()
@@ -19,21 +19,29 @@ repositories {
     jcenter()
 }
 
+kotlin {
+    sourceSets.all {
+        languageSettings {
+            languageVersion = '1.6'
+        }
+    }
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt'
 
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation('org.junit.jupiter:junit-jupiter:5.8.1')
 
-    testImplementation "org.mockito:mockito-core:3.5.10"
+    testImplementation 'org.mockito:mockito-core:4.0.0'
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2"
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2-native-mt'
 }
 
 tasks.test {
     useJUnitPlatform()
     testLogging {
-        events("passed", "skipped", "failed")
+        events "passed", "skipped", "failed"
     }
 }
